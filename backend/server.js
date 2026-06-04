@@ -1,14 +1,30 @@
-require('dotenv').config();
-
 const express = require('express');
 const cors    = require('cors');
 const bcrypt  = require('bcryptjs');
 const path    = require('path');
 const fs      = require('fs');
+const dotenv  = require('dotenv');
+
+dotenv.config();
+dotenv.config({ path: path.join(__dirname, '.env'), override: true });
 
 const app  = express();
 app.set('trust proxy', true);
 const PORT = process.env.PORT || 3001;
+
+const stripTrailingSlash = value => String(value || '').replace(/\/+$/, '');
+const configuredFrontendUrls = (process.env.FRONTEND_URL || process.env.FRONTEND_ORIGIN || '')
+  .split(',')
+  .map(url => stripTrailingSlash(url.trim()))
+  .filter(Boolean);
+
+const apiBaseUrl = () => {
+  const explicitApi = stripTrailingSlash(process.env.API_BASE_URL || process.env.PUBLIC_API_BASE_URL);
+  if (explicitApi) return explicitApi;
+
+  const backendUrl = stripTrailingSlash(process.env.BACKEND_URL || process.env.BACKEND_ORIGIN);
+  return backendUrl ? `${backendUrl}/api` : '';
+};
 
 const FRONTEND_DIR = [
   path.join(__dirname, '..', 'frontend'),
@@ -17,7 +33,7 @@ const FRONTEND_DIR = [
 ].find(d => fs.existsSync(path.join(d, 'index.html'))) || path.join(__dirname, '..', 'frontend');
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: configuredFrontendUrls.length ? configuredFrontendUrls : '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
@@ -25,9 +41,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get('/config.js', (_req, res) => {
-  const base = (process.env.BACKEND_URL || '').replace(/\/+$/, '');
   res.type('application/javascript');
-  res.send(`window.APP_CONFIG = { API_BASE: ${JSON.stringify(base ? base + '/api' : '')} };`);
+  res.send(`window.APP_CONFIG = { API_BASE: ${JSON.stringify(apiBaseUrl())} };`);
 });
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
