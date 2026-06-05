@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GB Election 2026 Results — Constituency SKD-4 Roundu</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f8fafc}
+.page{display:none}.page.active{display:block}
+.admin-section{display:none}.admin-section.active{display:block}
+.hero-bg{background:linear-gradient(135deg,#014421 0%,#1a7a38 60%,#22a855 100%)}
+.hero-photo{position:relative;background:#01160d}
+.hero-photo::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(1,22,13,.78),rgba(1,40,22,.62)),url('vote-hero.svg') center/cover no-repeat;z-index:0}
+.hero-photo>*{position:relative;z-index:1}
+.flag-bar{height:5px;background:linear-gradient(to right,#014421 34%,#fff 34%,#fff 66%,#014421 66%)}
+.r1{background:linear-gradient(135deg,#FFD700,#FFA500)}
+.r2{background:linear-gradient(135deg,#C0C0C0,#9E9E9E)}
+.r3{background:linear-gradient(135deg,#CD7F32,#A0522D)}
+@keyframes pulse2{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.pulse-anim{animation:pulse2 2s infinite}
+@keyframes fadein{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadein .45s ease forwards}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .9s linear infinite}
+.card{background:#fff;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.08);transition:transform .25s,box-shadow .25s}
+.card:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.14)}
+.vbar{height:8px;border-radius:4px;background:#e5e7eb;overflow:hidden}
+.vbar-fill{height:100%;border-radius:4px;transition:width 1.2s ease}
+.winner-glow{box-shadow:0 0 28px rgba(255,215,0,.5);border:2px solid #FFD700}
+#toast{position:fixed;bottom:24px;left:24px;z-index:9999;opacity:0;pointer-events:none;transition:opacity .3s}
+#toast.show{opacity:1;pointer-events:auto}
+.sbl{display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border-radius:10px;font-size:.875rem;color:#d1fae5;transition:background .2s;cursor:pointer;border:none;background:transparent;text-align:left}
+.sbl:hover{background:rgba(255,255,255,.1)}
+.sbl.active{background:rgba(255,255,255,.18);border-left:3px solid #FFD700;padding-left:11px}
+.cand-select{border:2px solid #e5e7eb;border-radius:14px;padding:14px;background:#fff}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#f1f1f1}::-webkit-scrollbar-thumb{background:#014421;border-radius:3px}
+.avatar{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:700;color:#fff;flex-shrink:0}
+.avatar-sm{width:44px;height:44px;font-size:1rem}
+.avatar-lg{width:80px;height:80px;font-size:1.8rem}
+.sym-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#f1f5f9;margin-right:4px;font-size:.9rem;line-height:1;vertical-align:middle}
+.ndt-marquee{height:1in;width:100%;overflow:hidden;display:flex;align-items:center;background:#000}
+.ndt-track{display:inline-flex;align-items:center;white-space:nowrap;will-change:transform;animation:ndt-scroll 22s linear infinite}
+.ndt-marquee:hover .ndt-track{animation-play-state:paused}
+.ndt-track a{color:#fff;font-weight:800;font-size:1.15rem;text-decoration:none;padding:0 3rem;letter-spacing:.3px;display:inline-flex;align-items:center;gap:.6rem}
+.ndt-track a .ndt-brand{color:#38bdf8;text-decoration:underline;text-underline-offset:3px}
+@keyframes ndt-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.wa-banner{background:#075E54;color:#fff;padding:12px 16px;direction:rtl}
+.wa-banner a{color:#fff}
+.wa-float{position:fixed;right:22px;bottom:22px;z-index:9999;width:60px;height:60px;border-radius:50%;background:#25D366;color:#fff;display:flex;align-items:center;justify-content:center;font-size:33px;box-shadow:0 6px 18px rgba(0,0,0,.3);transition:transform .2s;animation:wapulse 2s infinite}
+.wa-float:hover{transform:scale(1.12);background:#1ebe5d}
+.wa-float i{animation:wabob 1.6s ease-in-out infinite}
+@keyframes wapulse{0%{box-shadow:0 6px 18px rgba(0,0,0,.3),0 0 0 0 rgba(37,211,102,.6)}70%{box-shadow:0 6px 18px rgba(0,0,0,.3),0 0 0 18px rgba(37,211,102,0)}100%{box-shadow:0 6px 18px rgba(0,0,0,.3),0 0 0 0 rgba(37,211,102,0)}}
+@keyframes wabob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-3px) rotate(-8deg)}}
+</style>
+</head>
+<body>
+<script src="/config.js"></script>
+<script>
+  const API = (window.APP_CONFIG && window.APP_CONFIG.API_BASE) ? window.APP_CONFIG.API_BASE
+    : (location.protocol==='http:'||location.protocol==='https:') ? (location.origin+'/api') : 'http://localhost:3001/api';
+</script>
+<div id="toast"><div id="toast-inner" class="flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl text-white text-sm font-medium"><i id="toast-icon" class="fas fa-check-circle"></i><span id="toast-msg"></span></div></div>
+
+<!-- FLOATING WHATSAPP BUTTON -->
+<a href="https://wa.me/601137862785" target="_blank" rel="noopener" class="wa-float" aria-label="WhatsApp" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+<!-- NAVBAR -->
+<nav class="hero-bg shadow-xl sticky top-0 z-40">
+  <div class="flag-bar"></div>
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="showPage('home')">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow"><i class="fas fa-square-poll-vertical text-green-800 text-lg"></i></div>
+        <div><div class="text-white font-extrabold text-sm leading-tight">GB Election 2026 Results</div><div class="text-green-300 text-xs">Constituency SKD-4 Roundu</div></div>
+      </div>
+      <div class="hidden md:flex items-center gap-1">
+        <button onclick="showPage('home')" class="text-white hover:bg-green-800 px-4 py-2 rounded-lg text-sm font-medium transition"><i class="fas fa-house mr-1"></i>Home</button>
+        <button onclick="showPage('home');scrollToId('sec-charts')" class="text-white hover:bg-green-800 px-4 py-2 rounded-lg text-sm font-medium transition"><i class="fas fa-chart-line mr-1"></i>Live Results</button>
+        <button onclick="showPage('admin-login')" class="text-green-300 hover:bg-green-800 px-4 py-2 rounded-lg text-sm transition ml-1"><i class="fas fa-lock mr-1"></i>Admin</button>
+      </div>
+      <button class="md:hidden text-white text-xl" onclick="toggleMob()"><i class="fas fa-bars"></i></button>
+    </div>
+    <div id="mob-menu" class="hidden pb-3 md:hidden">
+      <button onclick="showPage('home');toggleMob()" class="block w-full text-left text-white hover:bg-green-800 px-4 py-2 rounded text-sm">Home</button>
+      <button onclick="showPage('home');scrollToId('sec-charts');toggleMob()" class="block w-full text-left text-white hover:bg-green-800 px-4 py-2 rounded text-sm">Live Results</button>
+      <button onclick="showPage('admin-login');toggleMob()" class="block w-full text-left text-green-300 hover:bg-green-800 px-4 py-2 rounded text-sm">Admin</button>
+    </div>
+  </div>
+</nav>
+
+<!-- HOME -->
+<div id="page-home" class="page active">
+  <section class="hero-bg hero-photo text-white py-20 px-4">
+    <div class="max-w-6xl mx-auto text-center">
+      <span class="inline-block bg-yellow-400 text-green-900 font-bold text-xs px-4 py-1 rounded-full mb-5 uppercase tracking-wider">GB Election 2026 — Results Monitoring · SKD-4 Roundu</span>
+      <h1 class="text-5xl md:text-7xl font-black mb-4 leading-tight">GB Election 2026<br><span class="text-yellow-400">Results — SKD-4 Roundu</span></h1>
+      <p class="text-green-200 text-lg max-w-2xl mx-auto mb-10">Live, polling-station-wise election results based on Form-45 data. Track candidate rankings, union council and polling station results, and turnout analytics.</p>
+      <div class="flex flex-wrap justify-center gap-4 mb-10">
+        <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl px-6 py-5 min-w-[150px]"><div class="text-3xl font-black text-yellow-400">18,806</div><div class="text-xs text-green-200 mt-1"><i class="fas fa-mars mr-1"></i>Total Male Voters</div></div>
+        <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl px-6 py-5 min-w-[150px]"><div class="text-3xl font-black text-yellow-400">16,121</div><div class="text-xs text-green-200 mt-1"><i class="fas fa-venus mr-1"></i>Total Female Voters</div></div>
+        <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl px-6 py-5 min-w-[150px] pulse-anim"><div class="text-3xl font-black text-yellow-400">34,927</div><div class="text-xs text-green-200 mt-1"><i class="fas fa-users mr-1"></i>Total Voters</div></div>
+        <div class="bg-white bg-opacity-10 backdrop-blur rounded-2xl px-6 py-5 min-w-[150px]"><div class="text-3xl font-black text-yellow-400">51</div><div class="text-xs text-green-200 mt-1"><i class="fas fa-building-columns mr-1"></i>Total Polling Stations</div></div>
+      </div>
+      <div class="flex flex-wrap justify-center gap-4">
+        <button onclick="scrollToId('sec-rankings')" class="bg-yellow-400 hover:bg-yellow-300 text-green-900 font-black text-lg px-10 py-4 rounded-xl transition shadow-lg"><i class="fas fa-ranking-star mr-2"></i>View Rankings</button>
+        <button onclick="scrollToId('sec-charts')" class="border-2 border-white text-white hover:bg-white hover:text-green-900 font-bold text-lg px-10 py-4 rounded-xl transition"><i class="fas fa-chart-line mr-2"></i>Live Charts</button>
+      </div>
+    </div>
+  </section>
+
+  <div class="ndt-marquee" role="banner" aria-label="North Digital Tech promo">
+    <div class="ndt-track">
+      <a href="https://www.northdigitaltech.com/" target="_blank" rel="noopener"><i class="fas fa-laptop-code"></i>Need a website, mobile app, or e-commerce solution? Contact <span class="ndt-brand">North Digital Tech</span> today</a>
+      <a href="https://www.northdigitaltech.com/" target="_blank" rel="noopener"><i class="fas fa-laptop-code"></i>Need a website, mobile app, or e-commerce solution? Contact <span class="ndt-brand">North Digital Tech</span> today</a>
+      <a href="https://www.northdigitaltech.com/" target="_blank" rel="noopener"><i class="fas fa-laptop-code"></i>Need a website, mobile app, or e-commerce solution? Contact <span class="ndt-brand">North Digital Tech</span> today</a>
+      <a href="https://www.northdigitaltech.com/" target="_blank" rel="noopener"><i class="fas fa-laptop-code"></i>Need a website, mobile app, or e-commerce solution? Contact <span class="ndt-brand">North Digital Tech</span> today</a>
+    </div>
+  </div>
+
+  <a href="https://wa.me/601137862785" target="_blank" rel="noopener" class="wa-banner block hover:opacity-95 transition">
+    <div class="max-w-5xl mx-auto flex items-center justify-center gap-3 text-center" style="font-size:1.1rem;font-weight:700;line-height:1.9">
+      <i class="fab fa-whatsapp" style="font-size:1.7rem"></i>
+      <span>اپنے پولنگ اسٹیشن کے نتائج ہمیں واٹس ایپ نمبر پر بھیجیں: <span dir="ltr">+60&nbsp;1137862785</span> — شکریہ</span>
+    </div>
+  </a>
+
+  <div class="bg-yellow-50 border-l-4 border-yellow-400 py-3 px-4">
+    <div class="max-w-7xl mx-auto flex items-start gap-3 text-sm text-yellow-800">
+      <i class="fas fa-circle-info text-yellow-500 mt-0.5 flex-shrink-0"></i>
+      <span><strong>Disclaimer:</strong> Unofficial results monitoring platform based on Form-45 and publicly available data. Not affiliated with any election authority. Verify official results with the relevant authorities.</span>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <section class="py-12 px-4 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div id="stat-cards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4"></div>
+    </div>
+  </section>
+
+  <!-- LEADER + TOP 3 -->
+  <section class="py-14 px-4 hero-bg text-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-8"><h2 class="text-3xl font-bold">Current Leading Candidate</h2><p class="text-green-200 mt-2">Live ranking based on counted Form-45 results</p>
+        <div class="inline-flex items-center gap-2 bg-white bg-opacity-10 rounded-full px-4 py-1.5 mt-3 text-sm"><span class="w-2 h-2 bg-green-400 rounded-full pulse-anim"></span> Auto-updating every 15 seconds</div></div>
+      <div id="home-top3" class="flex flex-wrap justify-center items-end gap-6 mb-10"></div>
+      <div id="home-winner" class="winner-glow bg-white bg-opacity-10 rounded-2xl p-6 text-center max-w-md mx-auto"></div>
+    </div>
+  </section>
+
+  <!-- RANKINGS -->
+  <section id="sec-rankings" class="py-16 px-4 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-8"><h2 class="text-3xl font-bold text-gray-800">Candidate Rankings</h2><p class="text-gray-500 mt-2">All candidates sorted by votes received</p></div>
+      <div class="flex flex-wrap gap-3 justify-center mb-8">
+        <input type="text" id="home-search" placeholder="🔍 Search candidate or party…" oninput="renderRankings()" class="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-72">
+        <select id="home-filter-party" onchange="renderRankings()" class="border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"><option value="">All Parties</option></select>
+      </div>
+      <div id="home-rankings" class="space-y-3"><div class="text-center py-12 text-gray-400"><i class="fas fa-spinner spin text-3xl"></i><p class="mt-3">Loading results…</p></div></div>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section id="sec-charts" class="py-16 px-4 bg-white">
+    <div class="max-w-7xl mx-auto">
+      <div class="text-center mb-10"><h2 class="text-3xl font-bold text-gray-800">Interactive Charts</h2><p class="text-gray-500 mt-2">Visual breakdown of the counted results</p></div>
+      <div class="grid md:grid-cols-2 gap-6 mb-6">
+        <div class="card p-6"><h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-chart-bar mr-2 text-green-700"></i>Candidate Vote Comparison</h3><canvas id="ch-bar" height="220"></canvas></div>
+        <div class="card p-6"><h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-chart-pie mr-2 text-blue-600"></i>Vote Share</h3><canvas id="ch-pie" height="220"></canvas></div>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="card p-6"><h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-building-columns mr-2 text-purple-600"></i>Polling Station Comparison</h3><canvas id="ch-line" height="220"></canvas></div>
+        <div class="card p-6"><h3 class="font-bold text-gray-800 mb-4"><i class="fas fa-map mr-2 text-yellow-600"></i>Union Council Comparison</h3><canvas id="ch-union" height="220"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UNION COUNCIL RESULTS -->
+  <section class="py-16 px-4 bg-gray-50">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-10"><h2 class="text-3xl font-bold text-gray-800">Union Council Results</h2><p class="text-gray-500 mt-2">Counted votes, turnout and leading candidate per union council</p></div>
+      <div id="home-unions" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"><div class="col-span-3 text-center py-10 text-gray-400"><i class="fas fa-spinner spin text-2xl"></i></div></div>
+    </div>
+  </section>
+
+  <!-- POLLING STATION RESULTS -->
+  <section class="py-16 px-4 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-10"><h2 class="text-3xl font-bold text-gray-800">Polling Station Results</h2><p class="text-gray-500 mt-2">Form-45 results by polling station</p></div>
+      <div id="home-stations" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"><div class="col-span-3 text-center py-10 text-gray-400">No polling stations yet.</div></div>
+    </div>
+  </section>
+
+
+  <footer class="hero-bg text-white py-10 px-4">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 mb-8">
+      <div><h3 class="font-bold text-lg mb-3">GB Election 2026 Results — SKD-4 Roundu</h3><p class="text-green-300 text-sm">An unofficial results monitoring platform for public information and transparency, based on Form-45 data.</p></div>
+      <div><h3 class="font-bold text-lg mb-3">Quick Links</h3><ul class="space-y-2 text-green-300 text-sm"><li><button onclick="showPage('home')" class="hover:text-white">Home</button></li><li><button onclick="scrollToId('sec-charts')" class="hover:text-white">Live Charts</button></li></ul></div>
+      <div><h3 class="font-bold text-lg mb-3">Contact</h3><div class="text-green-300 text-sm space-y-1"><div><i class="fas fa-envelope mr-2"></i><a href="mailto:info@northdigitaltech.com" class="hover:text-white">info@northdigitaltech.com</a></div><div><i class="fas fa-map-marker-alt mr-2"></i>GBLA SKD-4 Roundu, Gilgit Baltistan</div></div></div>
+    </div>
+    <div class="border-t border-green-700 pt-4 text-center text-green-400 text-xs leading-relaxed max-w-4xl mx-auto">
+      This website is an unofficial election results monitoring platform developed for public information and transparency. Results are based on polling station Form-45 data and publicly available information, and are not affiliated with or endorsed by any election commission or government authority. Official results must be verified through the relevant election authorities.<br>
+      © 2026 GB Election Results — SKD-4 Roundu · Developed By <a href="https://www.northdigitaltech.com/" target="_blank" rel="noopener" class="text-green-200 hover:text-white font-semibold">Shabbir Hussain</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="page-admin-login" class="page">
+  <div class="min-h-screen bg-gradient-to-br from-gray-900 to-green-900 flex items-center justify-center px-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div class="text-center mb-8"><div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4"><i class="fas fa-lock text-green-700 text-2xl"></i></div><h2 class="text-2xl font-bold text-gray-800">Admin Login</h2><p class="text-gray-400 text-sm mt-1">GB Election 2026 Results — SKD-4 Roundu</p></div>
+      <div class="space-y-4">
+        <div><label class="block text-sm font-semibold text-gray-700 mb-1">Username</label><input type="text" id="al-user" placeholder="admin" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500"></div>
+        <div><label class="block text-sm font-semibold text-gray-700 mb-1">Password</label><input type="password" id="al-pass" placeholder="••••••••" onkeypress="if(event.key==='Enter')doLogin()" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-green-500"></div>
+        <div id="al-err" class="hidden text-red-600 text-sm bg-red-50 rounded-xl p-3"></div>
+        <button onclick="doLogin()" id="btn-login" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-xl transition"><i class="fas fa-sign-in-alt mr-2"></i>Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div id="page-admin" class="page">
+  <div class="flex h-screen overflow-hidden bg-gray-100">
+    <div class="w-60 flex-shrink-0 bg-green-900 flex flex-col">
+      <div class="p-4 border-b border-green-700"><div class="flex items-center gap-3"><div class="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center flex-shrink-0"><i class="fas fa-user-shield text-green-900"></i></div><div><div class="text-white font-bold text-sm leading-tight">Admin Panel</div><div class="text-green-300 text-xs">SKD-4 Roundu</div></div></div></div>
+      <nav class="flex-1 p-3 space-y-1 overflow-y-auto">
+        <button onclick="aSection('overview')" id="sb-overview" class="sbl active"><i class="fas fa-gauge w-4"></i><span>Dashboard</span></button>
+        <button onclick="aSection('results')" id="sb-results" class="sbl"><i class="fas fa-square-poll-vertical w-4"></i><span>Result Entry</span></button>
+        <button onclick="aSection('candidates')" id="sb-candidates" class="sbl"><i class="fas fa-users w-4"></i><span>Candidates</span></button>
+        <button onclick="aSection('parties')" id="sb-parties" class="sbl"><i class="fas fa-flag w-4"></i><span>Parties</span></button>
+        <button onclick="aSection('unions')" id="sb-unions" class="sbl"><i class="fas fa-map w-4"></i><span>Union Councils</span></button>
+        <button onclick="aSection('stations')" id="sb-stations" class="sbl"><i class="fas fa-building-columns w-4"></i><span>Polling Stations</span></button>
+        <button onclick="aSection('reports')" id="sb-reports" class="sbl"><i class="fas fa-file-arrow-down w-4"></i><span>Reports</span></button>
+      </nav>
+      <div class="p-3 border-t border-green-700"><button onclick="doLogout()" class="sbl text-green-300 hover:text-white"><i class="fas fa-sign-out-alt w-4"></i><span>Logout</span></button></div>
+    </div>
+    <div class="flex-1 flex flex-col overflow-hidden">
+      <div class="bg-white shadow-sm px-6 py-4 flex items-center justify-between flex-shrink-0">
+        <h1 id="a-title" class="text-lg font-bold text-gray-800">Dashboard Overview</h1>
+        <div class="flex items-center gap-3"><span id="a-username" class="text-sm text-gray-500 hidden sm:inline">Welcome, Admin</span><div class="w-9 h-9 bg-green-700 rounded-full flex items-center justify-center text-white text-sm font-bold">A</div></div>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6">
+        <!-- Overview -->
+        <div id="as-overview" class="admin-section active">
+          <div id="a-stat-cards" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-6"></div>
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3">Vote Distribution</h3><canvas id="a-ch-bar" height="220"></canvas></div>
+            <div class="card p-5"><h3 class="font-bold text-gray-800 mb-3">Recent Activity</h3><div id="a-log" class="space-y-2 max-h-72 overflow-y-auto text-sm"></div></div>
+          </div>
+        </div>
+        <!-- Result Entry -->
+        <div id="as-results" class="admin-section hidden">
+          <div class="card p-6 mb-5">
+            <h2 class="font-bold text-gray-800 text-lg mb-4"><i class="fas fa-square-poll-vertical mr-2 text-green-700"></i>Enter Form-45 Results</h2>
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+              <div><label class="block text-sm font-semibold text-gray-700 mb-1">Polling Station *</label><select id="re-station" onchange="loadStationResults()" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"><option value="">Select polling station…</option></select></div>
+              <div><label class="block text-sm font-semibold text-gray-700 mb-1">Form-45 Reference</label><input type="text" id="re-form45" placeholder="e.g., PS-01/F45/001" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+            </div>
+            <div id="re-grid" class="space-y-2"></div>
+            <div id="re-actions" class="hidden mt-5 flex gap-3 justify-end">
+              <button onclick="clearStationResults()" class="border border-gray-300 text-gray-700 font-medium px-5 py-2 rounded-xl hover:bg-gray-50">Clear Station</button>
+              <button onclick="saveStationResults()" class="bg-green-700 hover:bg-green-600 text-white font-bold px-6 py-2 rounded-xl">Save Results</button>
+            </div>
+          </div>
+        </div>
+        <!-- Candidates -->
+        <div id="as-candidates" class="admin-section hidden">
+          <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-gray-800 text-lg">Candidate Management</h2><button onclick="openCandModal()" class="bg-green-700 hover:bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-lg"><i class="fas fa-plus mr-1"></i>Add Candidate</button></div>
+          <div class="card overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="px-4 py-3 text-left">Candidate</th><th class="px-4 py-3 text-left">Party</th><th class="px-4 py-3 text-left">Symbol</th><th class="px-4 py-3 text-center">Status</th><th class="px-4 py-3 text-center">Votes</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="a-cand-rows" class="divide-y divide-gray-100"></tbody></table></div></div>
+        </div>
+        <!-- Parties -->
+        <div id="as-parties" class="admin-section hidden">
+          <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-gray-800 text-lg">Political Party Management</h2><button onclick="openPartyModal()" class="bg-green-700 hover:bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-lg"><i class="fas fa-plus mr-1"></i>Add Party</button></div>
+          <div class="card overflow-hidden"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="px-4 py-3 text-left">Party</th><th class="px-4 py-3 text-left">Short</th><th class="px-4 py-3 text-left">Color</th><th class="px-4 py-3 text-center">Candidates</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="a-party-rows" class="divide-y divide-gray-100"></tbody></table></div>
+        </div>
+        <!-- Unions -->
+        <div id="as-unions" class="admin-section hidden">
+          <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-gray-800 text-lg">Union Council Management</h2><button onclick="openUnionModal()" class="bg-green-700 hover:bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-lg"><i class="fas fa-plus mr-1"></i>Add Union</button></div>
+          <div class="card overflow-hidden"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="px-4 py-3 text-left">#</th><th class="px-4 py-3 text-left">Union Council</th><th class="px-4 py-3 text-left">Code</th><th class="px-4 py-3 text-center">Registered</th><th class="px-4 py-3 text-center">Stations</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="a-union-rows" class="divide-y divide-gray-100"></tbody></table></div>
+        </div>
+        <!-- Stations -->
+        <div id="as-stations" class="admin-section hidden">
+          <div class="flex items-center justify-between mb-4"><h2 class="font-bold text-gray-800 text-lg">Polling Station Management</h2><button onclick="openStationModal()" class="bg-green-700 hover:bg-green-600 text-white text-sm font-bold px-4 py-2 rounded-lg"><i class="fas fa-plus mr-1"></i>Add Station</button></div>
+          <div class="card overflow-hidden"><div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-gray-50 text-gray-500 text-xs uppercase"><tr><th class="px-4 py-3 text-left">Station</th><th class="px-4 py-3 text-left">Code</th><th class="px-4 py-3 text-left">Union</th><th class="px-4 py-3 text-center">Registered</th><th class="px-4 py-3 text-center">Counted</th><th class="px-4 py-3 text-right">Actions</th></tr></thead><tbody id="a-station-rows" class="divide-y divide-gray-100"></tbody></table></div></div>
+        </div>
+        <!-- Reports -->
+        <div id="as-reports" class="admin-section hidden">
+          <h2 class="font-bold text-gray-800 text-lg mb-6">Reports</h2>
+          <div class="grid md:grid-cols-2 gap-5">
+            <div class="card p-6"><div class="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-file-lines text-red-600 text-xl"></i></div><h3 class="font-bold text-gray-800 mb-1">Overall Result Report</h3><p class="text-gray-400 text-sm mb-4">Candidate rankings & totals</p><button onclick="genReport('full')" class="bg-red-600 hover:bg-red-500 text-white text-sm font-bold px-4 py-2 rounded-lg">Download</button></div>
+            <div class="card p-6"><div class="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-file-csv text-emerald-600 text-xl"></i></div><h3 class="font-bold text-gray-800 mb-1">Results CSV (Form-45)</h3><p class="text-gray-400 text-sm mb-4">All station-wise results</p><button onclick="exportCSV()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold px-4 py-2 rounded-lg">Export CSV</button></div>
+            <div class="card p-6"><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-map text-blue-600 text-xl"></i></div><h3 class="font-bold text-gray-800 mb-1">Union Council Report</h3><p class="text-gray-400 text-sm mb-4">Results per union council</p><button onclick="genReport('union')" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-lg">Download</button></div>
+            <div class="card p-6"><div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-3"><i class="fas fa-building-columns text-purple-600 text-xl"></i></div><h3 class="font-bold text-gray-800 mb-1">Polling Station Report</h3><p class="text-gray-400 text-sm mb-4">Station-wise breakdown</p><button onclick="genReport('station')" class="bg-purple-600 hover:bg-purple-500 text-white text-sm font-bold px-4 py-2 rounded-lg">Download</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="m-candidate" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-5 border-b sticky top-0 bg-white z-10"><h3 id="m-cand-title" class="font-bold text-lg text-gray-800">Add Candidate</h3><button onclick="closeModal('m-candidate')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fas fa-times"></i></button></div>
+    <div class="p-6 space-y-4">
+      <input type="hidden" id="m-cand-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Candidate Name *</label><input type="text" id="m-cand-name" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Father Name</label><input type="text" id="m-cand-father" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Party *</label><select id="m-cand-party" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Election Symbol</label><input type="text" id="m-cand-symbol" placeholder="e.g., Arrow, Cricket Bat" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Photo URL</label><input type="text" id="m-cand-photo" placeholder="https://… (optional)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Contact</label><input type="text" id="m-cand-contact" placeholder="(optional)" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Introduction</label><textarea id="m-cand-desc" rows="2" class="w-full border border-gray-300 rounded-xl px-4 py-2.5 resize-none"></textarea></div>
+      <div class="flex items-center gap-2"><input type="checkbox" id="m-cand-active" checked class="w-4 h-4 accent-green-700"><label class="text-sm text-gray-700 font-medium">Active</label></div>
+    </div>
+    <div class="p-5 border-t flex gap-3 justify-end sticky bottom-0 bg-white"><button onclick="closeModal('m-candidate')" class="border border-gray-300 text-gray-700 font-medium px-5 py-2 rounded-xl hover:bg-gray-50">Cancel</button><button onclick="saveCandidate()" class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 rounded-xl">Save</button></div>
+  </div>
+</div>
+<div id="m-party" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between p-5 border-b"><h3 id="m-party-title" class="font-bold text-lg text-gray-800">Add Party</h3><button onclick="closeModal('m-party')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fas fa-times"></i></button></div>
+    <div class="p-6 space-y-4"><input type="hidden" id="m-party-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Party Name *</label><input type="text" id="m-party-name" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Short Name *</label><input type="text" id="m-party-short" placeholder="e.g., PPP" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Color</label><input type="color" id="m-party-color" value="#22c55e" class="w-20 h-10 border border-gray-300 rounded-lg"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Flag / Logo</label><input type="text" id="m-party-logo" placeholder="image URL or upload below" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"><div class="flex items-center gap-2 mt-2"><input type="file" id="m-party-logo-file" accept="image/*" class="text-xs"><button type="button" onclick="uploadPartyLogo()" class="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded">Upload</button><span id="m-party-logo-status" class="text-xs text-gray-400"></span></div></div>
+    </div>
+    <div class="p-5 border-t flex gap-3 justify-end"><button onclick="closeModal('m-party')" class="border border-gray-300 text-gray-700 font-medium px-5 py-2 rounded-xl hover:bg-gray-50">Cancel</button><button onclick="saveParty()" class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 rounded-xl">Save</button></div>
+  </div>
+</div>
+<div id="m-union" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between p-5 border-b"><h3 id="m-union-title" class="font-bold text-lg text-gray-800">Add Union Council</h3><button onclick="closeModal('m-union')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fas fa-times"></i></button></div>
+    <div class="p-6 space-y-4"><input type="hidden" id="m-union-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Union Council Name *</label><input type="text" id="m-union-name" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Union Code</label><input type="text" id="m-union-code" placeholder="e.g., UC-01" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Registered Voters</label><input type="number" id="m-union-reg" value="0" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+    </div>
+    <div class="p-5 border-t flex gap-3 justify-end"><button onclick="closeModal('m-union')" class="border border-gray-300 text-gray-700 font-medium px-5 py-2 rounded-xl hover:bg-gray-50">Cancel</button><button onclick="saveUnion()" class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 rounded-xl">Save</button></div>
+  </div>
+</div>
+<div id="m-station" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center px-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="flex items-center justify-between p-5 border-b"><h3 id="m-station-title" class="font-bold text-lg text-gray-800">Add Polling Station</h3><button onclick="closeModal('m-station')" class="text-gray-400 hover:text-gray-700 text-xl"><i class="fas fa-times"></i></button></div>
+    <div class="p-6 space-y-4"><input type="hidden" id="m-station-id">
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Station Name *</label><input type="text" id="m-station-name" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Station Code</label><input type="text" id="m-station-code" placeholder="e.g., PS-01" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Union Council</label><select id="m-station-union" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></select></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Location</label><input type="text" id="m-station-loc" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+      <div><label class="block text-sm font-semibold text-gray-700 mb-1">Registered Voters</label><input type="number" id="m-station-reg" value="0" class="w-full border border-gray-300 rounded-xl px-4 py-2.5"></div>
+    </div>
+    <div class="p-5 border-t flex gap-3 justify-end"><button onclick="closeModal('m-station')" class="border border-gray-300 text-gray-700 font-medium px-5 py-2 rounded-xl hover:bg-gray-50">Cancel</button><button onclick="saveStation()" class="bg-green-700 hover:bg-green-600 text-white font-bold px-5 py-2 rounded-xl">Save</button></div>
+  </div>
+</div>
+
+<script>
+// ── State & helpers ──
+let authToken = localStorage.getItem('h4r_token') || null;
+let data = { results:null, parties:[], candidates:[], unions:[], stations:[] };
+let charts = {}, refreshTimer = null, partyColor = {}, partyLogo = {};
+const SYMBOL_EMOJI = {'Arrow':'➡️','Tiger':'🐯','Kite':'🪁','Cricket Bat':'🏏','Lamp':'🪔','Book':'📖','Star':'⭐','Sun':'☀️','Flower':'🌸','Hammer':'🔨','Moon':'🌙','Scale':'⚖️','Axe':'🪓','Eagle':'🦅','Tent':'⛺','Railway Engine':'🚂','Pine Apple':'🍍','Pineapple':'🍍','Topi Shanti':'🧢','Topi':'🧢','Bulb':'💡','Key with Lock':'🔐','Key':'🔑','Lock':'🔒','Two Swords':'⚔️','Sword':'⚔️','Bat':'🏏','Cap':'🧢','Train':'🚂'};
+const FALLBACK_COLORS = {'PPP':'#3b82f6','PML-N':'#ef4444','IPP':'#f97316','PTI':'#22c55e','MWM':'#991b1b','PNP':'#7c3aed','AWP':'#dc2626','Independent':'#94a3b8','JUI-F':'#a855f7','ITP':'#0d9488'};
+function pc(p){ return partyColor[p] || FALLBACK_COLORS[p] || '#64748b'; }
+function symEmoji(s){ return SYMBOL_EMOJI[s] || '🗳️'; }
+function symIcon(s){ return `<span class="sym-icon">${symEmoji(s)}</span>`; }
+function initials(n){ return (n||'?').split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function fmt(n){ return Number(n||0).toLocaleString(); }
+function pctOf(n,d){ return d>0 ? (n/d*100).toFixed(1) : '0.0'; }
+function fmtTime(s){ try{return new Date(s).toLocaleString('en-PK',{dateStyle:'short',timeStyle:'short'});}catch(e){return s;} }
+const MEDIA_BASE = (typeof API==='string') ? API.replace(/\/api\/?$/,'') : '';
+function media(u){ if(!u) return u; if(/^(https?:)?\/\//.test(u)||/^data:/.test(u)) return u; return MEDIA_BASE+(u.charAt(0)==='/'?u:'/'+u); }
+const IND_FLAGS=['/logos/ind1.svg','/logos/ind2.svg','/logos/ind3.svg','/logos/ind4.svg','/logos/ind5.svg'];
+function shash(s){let h=0;s=String(s||'');for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return h;}
+function flagFor(c){ const p=c.party_name||''; if(p.toLowerCase()==='independent') return media(IND_FLAGS[shash(c.name)%IND_FLAGS.length]); const lg=partyLogo[p]; return lg?media(lg):media(IND_FLAGS[shash(c.name)%IND_FLAGS.length]); }
+function flagImg(c,cls='h-7 w-10'){ const f=flagFor(c); return f?`<img src="${f}" class="${cls} rounded shadow-sm flex-shrink-0" style="object-fit:cover" alt="${c.party_name||''} flag">`:''; }
+function avatarEl(name,party,size=''){ return `<div class="avatar ${size}" style="background:${pc(party)}">${initials(name)}</div>`; }
+function photoEl(name,party,photo,size=''){ if(photo) return `<div class="avatar ${size}" style="background:${pc(party)};overflow:hidden;padding:0"><img src="${media(photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='${initials(name)}';this.parentElement.style.padding=''"></div>`; return avatarEl(name,party,size); }
+function scrollToId(id){ const el=document.getElementById(id); if(el) el.scrollIntoView({behavior:'smooth'}); }
+function toggleMob(){ document.getElementById('mob-menu').classList.toggle('hidden'); }
+
+async function apiFetch(path, opts={}) {
+  if (authToken) opts.headers = {...(opts.headers||{}), 'Authorization':'Bearer '+authToken};
+  if (opts.body && typeof opts.body==='object'){ opts.headers={...(opts.headers||{}),'Content-Type':'application/json'}; opts.body=JSON.stringify(opts.body); }
+  const res = await fetch(API+path, opts);
+  const d = await res.json().catch(()=>({}));
+  if (!res.ok) throw new Error(d.error || ('HTTP '+res.status));
+  return d;
+}
+
+// ── Init ──
+async function init(){ await loadParties(); await loadPublic(); startRefresh(); }
+function startRefresh(){ if(refreshTimer) clearInterval(refreshTimer); refreshTimer=setInterval(loadPublic, 15000); }
+async function loadParties(){ try{ data.parties = await apiFetch('/parties'); partyColor={}; partyLogo={}; data.parties.forEach(p=>{partyColor[p.short_name]=p.color; partyLogo[p.short_name]=p.logo;}); buildPartyFilters(); }catch(e){} }
+async function loadPublic(){
+  try{
+    const r = await apiFetch('/results');
+    data.results=r; data.candidates=r.candidates; data.unions=r.unions; data.stations=r.polling_stations;
+    renderStats(); renderWinnerTop3(); renderRankings(); renderUnions(); renderStations(); renderCharts();
+  }catch(e){ showToast('⚠️ Cannot load results. Backend may be offline.', 'bg-red-600'); }
+}
+function buildPartyFilters(){
+  const opts = '<option value="">All Parties</option>' + data.parties.map(p=>`<option value="${p.short_name}">${p.short_name}</option>`).join('');
+  ['home-filter-party'].forEach(id=>{ const el=document.getElementById(id); if(el) el.innerHTML=opts; });
+}
+
+// ── Navigation ──
+function showPage(p){ document.querySelectorAll('.page').forEach(e=>e.classList.remove('active')); document.getElementById('page-'+p)?.classList.add('active'); window.scrollTo(0,0);
+  if(p==='admin'){ if(!authToken){showPage('admin-login');return;} aSection('overview'); } }
+
+// ── Public render ──
+function statCard(label,value,icon,color){ return `<div class="card p-4 border-l-4" style="border-color:${color}"><div class="flex items-center justify-between"><div><div class="text-gray-400 text-xs uppercase tracking-wide">${label}</div><div class="text-2xl font-black text-gray-800 mt-1">${value}</div></div><i class="fas ${icon} text-2xl" style="color:${color}"></i></div></div>`; }
+function renderStats(){
+  const r=data.results; if(!r) return; const c=r.counts;
+  document.getElementById('stat-cards').innerHTML = [
+    statCard('Total Votes Counted', fmt(r.total), 'fa-square-poll-vertical', '#16a34a'),
+    statCard('Registered Voters', fmt(r.registered), 'fa-users', '#2563eb'),
+    statCard('Voter Turnout', r.turnout+'%', 'fa-percent', '#7c3aed'),
+    statCard('Candidates', fmt(c.candidates), 'fa-user-tie', '#f59e0b'),
+    statCard('Parties', fmt(c.parties), 'fa-flag', '#db2777'),
+    statCard('Union Councils', fmt(c.unions), 'fa-map', '#0d9488'),
+    statCard('Polling Stations', fmt(c.polling_stations), 'fa-building-columns', '#0ea5e9'),
+    statCard('Stations Reported', fmt(c.ps_reported), 'fa-circle-check', '#22c55e'),
+    statCard('Stations Pending', fmt(c.ps_pending), 'fa-clock', '#ef4444'),
+  ].join('');
+}
+function renderWinnerTop3(){
+  const cands=[...data.candidates].sort((a,b)=>b.vote_count-a.vote_count);
+  const total=cands.reduce((s,c)=>s+Number(c.vote_count),0);
+  const win=document.getElementById('home-winner');
+  if(cands[0]){ const w=cands[0],v=Number(w.vote_count); win.innerHTML=`<div class="text-yellow-400 text-lg mb-2 font-bold">🏆 Leading Candidate</div>${photoEl(w.name,w.party_name,w.photo,'avatar-lg mx-auto mb-3')}<div class="text-xl font-black text-white">${w.name}</div><div class="text-green-200 text-sm">${w.party_name}</div><div class="mt-2 flex justify-center">${flagImg(w,'h-9 w-14')}</div><div class="mt-3 text-3xl font-black text-yellow-400">${fmt(v)} Votes</div><div class="text-green-200 text-sm">${pctOf(v,total)}% of counted votes</div>`; }
+  else win.innerHTML='<div class="text-green-200">No results counted yet.</div>';
+  const top=cands.slice(0,3), order=[1,0,2], heights=['190px','230px','190px'], badges=['🥈 2nd','🥇 1st','🥉 3rd'], cls=['r2','r1','r3'];
+  document.getElementById('home-top3').innerHTML = order.map((ri,pi)=>{ if(!top[ri]) return ''; const c=top[ri],v=Number(c.vote_count);
+    return `<div class="text-center fadein">${photoEl(c.name,c.party_name,c.photo,'avatar-lg mx-auto mb-2 shadow-xl border-4 border-white')}<div class="font-bold text-white text-sm">${c.name}</div><div class="text-xs text-green-200">${c.party_name}</div><div class="flex justify-center mt-1">${flagImg(c,'h-6 w-9')}</div><div class="${cls[pi]} rounded-2xl px-4 mt-3 flex flex-col items-center justify-start pt-3" style="height:${heights[pi]}"><div class="text-2xl font-black text-white">${badges[pi]}</div><div class="text-white font-bold text-lg mt-1">${fmt(v)}</div><div class="text-white text-sm opacity-80">votes</div><div class="text-white font-bold text-xl mt-2">${pctOf(v,total)}%</div></div></div>`;
+  }).join('');
+}
+function renderRankings(){
+  const q=(document.getElementById('home-search')?.value||'').toLowerCase();
+  const pf=document.getElementById('home-filter-party')?.value||'';
+  const cands=[...data.candidates].sort((a,b)=>b.vote_count-a.vote_count);
+  const total=cands.reduce((s,c)=>s+Number(c.vote_count),0);
+  const filt=cands.filter(c=>(!q||c.name.toLowerCase().includes(q)||c.party_name.toLowerCase().includes(q))&&(!pf||c.party_name===pf));
+  const cont=document.getElementById('home-rankings'); if(!cont) return;
+  if(!filt.length){ cont.innerHTML='<div class="text-center py-10 text-gray-400">No candidates found.</div>'; return; }
+  cont.innerHTML=filt.map((c)=>{ const rank=cands.indexOf(c)+1, v=Number(c.vote_count), p2=pctOf(v,total);
+    const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const bg=rank===1?'bg-yellow-50 border-yellow-200':rank===2?'bg-gray-50 border-gray-200':rank===3?'bg-orange-50 border-orange-200':'bg-white border-gray-100';
+    return `<div class="border ${bg} rounded-xl p-4 flex items-center gap-4 fadein"><div class="text-2xl w-8 flex-shrink-0 text-center">${medal}</div>${photoEl(c.name,c.party_name,c.photo,'avatar-sm flex-shrink-0')}${flagImg(c,'h-8 w-12')}<div class="flex-1 min-w-0"><div class="font-bold text-gray-800 text-sm">${c.name}</div><div class="text-xs font-semibold flex items-center" style="color:${pc(c.party_name)}">${c.party_name} · ${symIcon(c.symbol)}<span class="text-gray-400 font-normal">${c.symbol||''}</span></div><div class="vbar mt-1.5"><div class="vbar-fill" style="width:${p2}%;background:${pc(c.party_name)}"></div></div></div><div class="text-right flex-shrink-0"><div class="font-black text-gray-800 text-lg">${fmt(v)}</div><div class="text-xs text-gray-400">${p2}%</div></div></div>`;
+  }).join('');
+}
+function unionCard(u){
+  const cands=(u.candidates||[]), reg=Number(u.registered_total||0), counted=Number(u.total_votes||0);
+  return `<div class="card p-5"><div class="flex items-center justify-between mb-2"><h3 class="font-bold text-gray-800 text-sm"><i class="fas fa-map-marker-alt mr-2 text-green-700"></i>${u.union_name}${u.union_code?` <span class="text-gray-400 font-normal">(${u.union_code})</span>`:''}</h3><span class="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">${fmt(counted)} votes</span></div>
+    <div class="text-xs text-gray-500 mb-3">Registered: ${fmt(reg)} · Turnout: ${u.turnout||0}% · Stations: ${fmt(u.ps_count||0)}</div>
+    ${cands.slice(0,4).map(c=>{const v=Number(c.votes),p2=pctOf(v,counted);return `<div class="mb-2"><div class="flex justify-between text-xs mb-1"><span class="font-medium text-gray-700">${c.name}</span><span class="text-gray-500">${fmt(v)} · ${p2}%</span></div><div class="vbar"><div class="vbar-fill" style="width:${p2}%;background:${pc(c.party_name)}"></div></div></div>`;}).join('') || '<div class="text-xs text-gray-400 italic">No results yet</div>'}
+    ${u.leader?`<div class="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500"><i class="fas fa-crown mr-1 text-yellow-500"></i>Leading: <strong style="color:${pc(u.leader.party_name)}">${u.leader.name}</strong></div>`:''}</div>`;
+}
+function renderUnions(){ const cont=document.getElementById('home-unions'); if(!cont) return; if(!data.unions.length){cont.innerHTML='<div class="col-span-3 text-center py-10 text-gray-400">No union councils.</div>';return;} cont.innerHTML=data.unions.map(unionCard).join(''); }
+function stationCard(s){
+  const cands=s.candidates||[], reg=Number(s.registered_voters||0), counted=Number(s.votes_counted||0);
+  return `<div class="card p-5"><div class="flex items-center justify-between mb-2"><h3 class="font-bold text-gray-800 text-sm"><i class="fas fa-building-columns mr-2 text-green-700"></i>${s.station_name}${s.station_code?` <span class="text-gray-400 font-normal">(${s.station_code})</span>`:''}</h3>${s.reported?'<span class="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">Reported</span>':'<span class="text-xs bg-gray-100 text-gray-500 font-bold px-2 py-0.5 rounded-full">Pending</span>'}</div>
+    <div class="text-xs text-gray-500 mb-3">${s.union_name||'—'} · Registered: ${fmt(reg)} · Turnout: ${s.turnout||0}%</div>
+    ${cands.slice(0,4).map(c=>{const v=Number(c.votes),p2=pctOf(v,counted);return `<div class="mb-2"><div class="flex justify-between text-xs mb-1"><span class="font-medium text-gray-700">${c.name}</span><span class="text-gray-500">${fmt(v)} · ${p2}%</span></div><div class="vbar"><div class="vbar-fill" style="width:${p2}%;background:${pc(c.party_name)}"></div></div></div>`;}).join('') || '<div class="text-xs text-gray-400 italic">No results yet</div>'}
+    ${s.leader?`<div class="mt-2 pt-2 border-t border-gray-100 text-xs text-gray-500"><i class="fas fa-crown mr-1 text-yellow-500"></i>Leading: <strong style="color:${pc(s.leader.party_name)}">${s.leader.name}</strong></div>`:''}</div>`;
+}
+function renderStations(){ const cont=document.getElementById('home-stations'); if(!cont) return; if(!data.stations.length){cont.innerHTML='<div class="col-span-3 text-center py-10 text-gray-400">No polling stations added yet.</div>';return;} cont.innerHTML=data.stations.map(stationCard).join(''); }
+function destroyChart(n){ if(charts[n]){charts[n].destroy();delete charts[n];} }
+function renderCharts(){
+  const r=data.results; if(!r) return; const cands=r.candidates, total=r.total;
+  destroyChart('bar'); const bc=document.getElementById('ch-bar');
+  if(bc) charts.bar=new Chart(bc,{type:'bar',data:{labels:cands.map(c=>c.name.split(' ').slice(0,2).join(' ')),datasets:[{data:cands.map(c=>Number(c.vote_count)),backgroundColor:cands.map(c=>pc(c.party_name)),borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}});
+  destroyChart('pie'); const pcv=document.getElementById('ch-pie');
+  if(pcv) charts.pie=new Chart(pcv,{type:'doughnut',data:{labels:cands.map(c=>c.name),datasets:[{data:cands.map(c=>Number(c.vote_count)),backgroundColor:cands.map(c=>pc(c.party_name)),borderWidth:2,borderColor:'#fff'}]},options:{responsive:true,cutout:'60%',plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}}}});
+  destroyChart('line'); const lc=document.getElementById('ch-line');
+  if(lc && r.polling_stations){ const top3=cands.slice(0,3); const st=r.polling_stations.filter(s=>s.reported); const ds=top3.map(c=>({label:c.name.split(' ')[0],data:st.map(s=>{const x=s.candidates?.find(z=>z.cid===c.id);return Number(x?.votes||0);}),backgroundColor:pc(c.party_name)+'cc',borderRadius:4})); charts.line=new Chart(lc,{type:'bar',data:{labels:st.map(s=>s.station_code||s.station_name),datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}}); }
+  destroyChart('union'); const uc=document.getElementById('ch-union');
+  if(uc&&r.unions){ const top3=cands.slice(0,3); const ds=top3.map(c=>({label:c.name.split(' ')[0],data:r.unions.map(u=>{const x=u.candidates?.find(z=>z.cid===c.id);return Number(x?.votes||0);}),backgroundColor:pc(c.party_name)+'cc',borderRadius:4}));
+    charts.union=new Chart(uc,{type:'bar',data:{labels:r.unions.map(u=>(u.union_code||u.union_name)),datasets:ds},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:10},boxWidth:12}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}}); }
+}
+
+// ── Reports ──
+async function genReport(type){
+  try{ const r=await apiFetch('/results'); const date=new Date().toLocaleDateString('en-PK',{year:'numeric',month:'long',day:'numeric'}); let c='';
+    if(type==='full'){ c=`GB ELECTION 2026 RESULTS — SKD-4 ROUNDU\nGenerated: ${date}\nTotal Counted: ${fmt(r.total)} | Registered: ${fmt(r.registered)} | Turnout: ${r.turnout}%\n\n=== CANDIDATE RANKINGS ===\n`; r.candidates.forEach((x,i)=>c+=`${i+1}. ${x.name} (${x.party_name}) — ${fmt(x.vote_count)} votes (${pctOf(x.vote_count,r.total)}%)\n`); }
+    else if(type==='union'){ c=`GB ELECTION 2026 — UNION COUNCIL RESULTS (SKD-4 Roundu)\nGenerated: ${date}\n`; r.unions.forEach(u=>{c+=`\n=== ${u.union_name} (${u.union_code||''}) — ${fmt(u.total_votes)} votes, turnout ${u.turnout}% ===\n`;(u.candidates||[]).forEach((x,i)=>c+=`  ${i+1}. ${x.name} (${x.party_name}) — ${fmt(x.votes)}\n`);}); }
+    else { c=`GB ELECTION 2026 — POLLING STATION RESULTS (SKD-4 Roundu)\nGenerated: ${date}\n`; r.polling_stations.forEach(s=>{c+=`\n=== ${s.station_name} (${s.station_code||''}) — ${s.union_name||''} — ${fmt(s.votes_counted)} votes, turnout ${s.turnout}% ===\n`;(s.candidates||[]).forEach((x,i)=>c+=`  ${i+1}. ${x.name} (${x.party_name}) — ${fmt(x.votes)}\n`);}); }
+    const b=new Blob([c],{type:'text/plain'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`skd4_${type}_report.txt`; a.click(); showToast('Report downloaded.','bg-green-600');
+  }catch(e){ showToast(e.message,'bg-red-600'); }
+}
+function exportCSV(){ const url=API+'/admin/export/csv'; fetch(url,{headers:{'Authorization':'Bearer '+authToken}}).then(r=>r.blob()).then(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='election_results_skd4.csv';a.click();}).catch(()=>showToast('Export failed','bg-red-600')); }
+
+// ── Admin auth ──
+async function doLogin(){ const u=document.getElementById('al-user').value.trim(),p=document.getElementById('al-pass').value,err=document.getElementById('al-err'); err.classList.add('hidden');
+  try{ const r=await apiFetch('/admin/login',{method:'POST',body:{username:u,password:p}}); authToken=r.token; localStorage.setItem('h4r_token',authToken); document.getElementById('a-username').textContent='Welcome, '+r.username; showPage('admin'); aSection('overview'); }
+  catch(e){ err.textContent=e.message; err.classList.remove('hidden'); } }
+function doLogout(){ authToken=null; localStorage.removeItem('h4r_token'); showPage('home'); showToast('Logged out.','bg-gray-700'); }
+function aSection(name){ document.querySelectorAll('.admin-section').forEach(e=>{e.classList.remove('active');e.classList.add('hidden');}); document.querySelectorAll('.sbl').forEach(e=>e.classList.remove('active'));
+  document.getElementById('as-'+name)?.classList.replace('hidden','active'); document.getElementById('sb-'+name)?.classList.add('active');
+  const t={overview:'Dashboard Overview',results:'Result Entry (Form-45)',candidates:'Candidate Management',parties:'Political Party Management',unions:'Union Council Management',stations:'Polling Station Management',reports:'Reports'};
+  document.getElementById('a-title').textContent=t[name]||name;
+  if(name==='overview') adminOverview();
+  if(name==='results') initResultEntry();
+  if(name==='candidates') loadAdminCandidates();
+  if(name==='parties') loadAdminParties();
+  if(name==='unions') loadAdminUnions();
+  if(name==='stations') loadAdminStations();
+}
+async function adminOverview(){
+  try{ const s=await apiFetch('/admin/stats');
+    document.getElementById('a-stat-cards').innerHTML=[
+      statCard('Total Counted',fmt(s.total_votes),'fa-square-poll-vertical','#16a34a'),
+      statCard('Registered',fmt(s.registered_voters),'fa-users','#2563eb'),
+      statCard('Turnout',s.turnout+'%','fa-percent','#7c3aed'),
+      statCard('Candidates',fmt(s.total_candidates),'fa-user-tie','#f59e0b'),
+      statCard('Parties',fmt(s.total_parties),'fa-flag','#db2777'),
+      statCard('Unions',fmt(s.total_unions),'fa-map','#0d9488'),
+      statCard('Stations',fmt(s.total_polling_stations),'fa-building-columns','#0ea5e9'),
+      statCard('Reported',fmt(s.ps_reported),'fa-circle-check','#22c55e'),
+      statCard('Pending',fmt(s.ps_pending),'fa-clock','#ef4444'),
+    ].join('');
+    const el=document.getElementById('a-log'); el.innerHTML=(s.logs||[]).length? s.logs.map(l=>`<div class="flex items-start gap-2 p-2 bg-gray-50 rounded-lg text-xs"><i class="fas fa-circle text-green-500 mt-1 text-[6px]"></i><div><span class="font-semibold">${l.action}</span> — ${l.details||''} <span class="text-gray-400">· ${fmtTime(l.created_at)}</span></div></div>`).join('') : '<div class="text-gray-400 text-center py-4">No activity yet</div>';
+    destroyChart('abar'); const bc=document.getElementById('a-ch-bar'); if(bc&&s.candidates) charts.abar=new Chart(bc,{type:'bar',data:{labels:s.candidates.map(c=>c.name.split(' ')[0]),datasets:[{data:s.candidates.map(c=>Number(c.vote_count)),backgroundColor:s.candidates.map(c=>pc(c.party_name)),borderRadius:8}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}});
+  }catch(e){ if(String(e.message).includes('401')||/token/i.test(e.message)){authToken=null;localStorage.removeItem('h4r_token');showPage('admin-login');} } }
+
+// ── Admin: result entry ──
+async function initResultEntry(){
+  const [stations] = [await apiFetch('/admin/polling-stations')];
+  const sel=document.getElementById('re-station'); sel.innerHTML='<option value="">Select polling station…</option>'+stations.map(s=>`<option value="${s.id}">${s.station_name}${s.station_code?` (${s.station_code})`:''}${s.union_name?` — ${s.union_name}`:''}</option>`).join('');
+  document.getElementById('re-grid').innerHTML=''; document.getElementById('re-actions').classList.add('hidden');
+}
+async function loadStationResults(){
+  const sid=document.getElementById('re-station').value; const grid=document.getElementById('re-grid'); const actions=document.getElementById('re-actions');
+  if(!sid){ grid.innerHTML=''; actions.classList.add('hidden'); return; }
+  const cands=await apiFetch('/admin/candidates');
+  const existing=await apiFetch('/admin/results?station_id='+sid);
+  const map={}; existing.forEach(r=>map[r.candidate_id]=r.votes);
+  if(existing[0]&&existing[0].form45_ref) document.getElementById('re-form45').value=existing[0].form45_ref;
+  grid.innerHTML=cands.filter(c=>c.active).map(c=>`<div class="flex items-center gap-3 border border-gray-200 rounded-xl px-3 py-2"><div class="w-8 text-center">${symEmoji(c.symbol)}</div><div class="flex-1"><div class="font-semibold text-gray-800 text-sm">${c.name}</div><div class="text-xs" style="color:${pc(c.party_name)}">${c.party_name}</div></div><input type="number" min="0" id="re-v-${c.id}" value="${map[c.id]!=null?map[c.id]:''}" placeholder="0" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right"></div>`).join('');
+  actions.classList.remove('hidden');
+}
+async function saveStationResults(){
+  const sid=document.getElementById('re-station').value; if(!sid) return showToast('Select a polling station.','bg-red-600');
+  const form45=document.getElementById('re-form45').value.trim();
+  const cands=await apiFetch('/admin/candidates'); const entries=cands.filter(c=>c.active).map(c=>({candidate_id:c.id,votes:Number(document.getElementById('re-v-'+c.id)?.value)||0}));
+  try{ await apiFetch('/admin/results',{method:'POST',body:{polling_station_id:Number(sid),form45_ref:form45,entries}}); showToast('Results saved.','bg-green-600'); loadPublic(); }
+  catch(e){ showToast(e.message,'bg-red-600'); }
+}
+async function clearStationResults(){ const sid=document.getElementById('re-station').value; if(!sid) return; if(!confirm('Clear all results for this station?')) return;
+  try{ await apiFetch('/admin/results/station/'+sid,{method:'DELETE'}); showToast('Cleared.','bg-red-600'); loadStationResults(); loadPublic(); }catch(e){ showToast(e.message,'bg-red-600'); } }
+
+// ── Admin: candidates ──
+function fillPartySelect(sel,val){ sel.innerHTML=data.parties.map(p=>`<option value="${p.short_name}" data-id="${p.id}">${p.party_name} (${p.short_name})</option>`).join(''); if(val) sel.value=val; }
+async function loadAdminCandidates(){ try{ const rows=await apiFetch('/admin/candidates'); document.getElementById('a-cand-rows').innerHTML=rows.map(c=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3"><div class="flex items-center gap-3">${avatarEl(c.name,c.party_name,'avatar-sm')}${flagImg(c,'h-7 w-10')}<div><div class="font-semibold text-gray-800">${c.name}</div>${c.father_name?`<div class="text-xs text-gray-400">s/o ${c.father_name}</div>`:''}</div></div></td><td class="px-4 py-3"><span class="text-xs font-bold px-2 py-1 rounded-full text-white" style="background:${pc(c.party_name)}">${c.party_name}</span></td><td class="px-4 py-3 text-sm text-gray-600">${symIcon(c.symbol)}${c.symbol||'—'}</td><td class="px-4 py-3 text-center"><span class="text-xs font-bold px-2 py-1 rounded-full ${c.active?'bg-green-100 text-green-700':'bg-gray-100 text-gray-500'}">${c.active?'Active':'Inactive'}</span></td><td class="px-4 py-3 text-center font-bold">${fmt(c.vote_count)}</td><td class="px-4 py-3 text-right"><button onclick="editCand(${c.id})" class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-semibold mr-1"><i class="fas fa-edit"></i></button><button onclick="delCand(${c.id})" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-semibold"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }catch(e){ showToast(e.message,'bg-red-600'); } }
+function openCandModal(){ document.getElementById('m-cand-id').value=''; document.getElementById('m-cand-title').textContent='Add Candidate'; ['m-cand-name','m-cand-father','m-cand-symbol','m-cand-photo','m-cand-contact','m-cand-desc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('m-cand-active').checked=true; fillPartySelect(document.getElementById('m-cand-party')); document.getElementById('m-candidate').classList.remove('hidden'); }
+async function editCand(id){ try{ const c=await apiFetch('/candidates/'+id); document.getElementById('m-cand-id').value=c.id; document.getElementById('m-cand-title').textContent='Edit Candidate'; document.getElementById('m-cand-name').value=c.name; document.getElementById('m-cand-father').value=c.father_name||''; fillPartySelect(document.getElementById('m-cand-party'),c.party_name); document.getElementById('m-cand-symbol').value=c.symbol||''; document.getElementById('m-cand-photo').value=c.photo||''; document.getElementById('m-cand-contact').value=c.contact||''; document.getElementById('m-cand-desc').value=c.description||''; document.getElementById('m-cand-active').checked=!!c.active; document.getElementById('m-candidate').classList.remove('hidden'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+async function saveCandidate(){ const id=document.getElementById('m-cand-id').value; const sel=document.getElementById('m-cand-party'); const opt=sel.options[sel.selectedIndex];
+  const payload={name:document.getElementById('m-cand-name').value.trim(),father_name:document.getElementById('m-cand-father').value.trim(),party_name:sel.value,party_id:opt?Number(opt.dataset.id):null,symbol:document.getElementById('m-cand-symbol').value.trim(),photo:document.getElementById('m-cand-photo').value.trim(),contact:document.getElementById('m-cand-contact').value.trim(),description:document.getElementById('m-cand-desc').value.trim(),active:document.getElementById('m-cand-active').checked};
+  if(!payload.name) return showToast('Name required.','bg-red-600');
+  try{ if(id) await apiFetch('/admin/candidates/'+id,{method:'PUT',body:payload}); else await apiFetch('/admin/candidates',{method:'POST',body:payload}); closeModal('m-candidate'); loadAdminCandidates(); loadParties(); loadPublic(); showToast('Saved.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+async function delCand(id){ if(!confirm('Delete this candidate?')) return; try{ const r=await apiFetch('/admin/candidates/'+id,{method:'DELETE'}); showToast(r.message||'Deleted.','bg-green-600'); loadAdminCandidates(); loadPublic(); }catch(e){ showToast(e.message,'bg-red-600'); } }
+
+// ── Admin: parties ──
+async function loadAdminParties(){ try{ const rows=await apiFetch('/admin/parties'); document.getElementById('a-party-rows').innerHTML=rows.map(p=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold text-gray-800"><div class="flex items-center gap-2">${p.logo?`<img src="${media(p.logo)}" class="h-6 w-9 rounded" style="object-fit:cover">`:''}<span>${p.party_name}</span></div></td><td class="px-4 py-3">${p.short_name}</td><td class="px-4 py-3"><span class="inline-block w-5 h-5 rounded-full align-middle" style="background:${p.color}"></span> <span class="text-xs text-gray-500">${p.color}</span></td><td class="px-4 py-3 text-center">${fmt(p.candidate_count)}</td><td class="px-4 py-3 text-right"><button onclick='editParty(${JSON.stringify(p)})' class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-semibold mr-1"><i class="fas fa-edit"></i></button><button onclick="delParty(${p.id})" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-semibold"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }catch(e){ showToast(e.message,'bg-red-600'); } }
+function openPartyModal(){ document.getElementById('m-party-id').value=''; document.getElementById('m-party-title').textContent='Add Party'; document.getElementById('m-party-name').value=''; document.getElementById('m-party-short').value=''; document.getElementById('m-party-color').value='#22c55e'; document.getElementById('m-party-logo').value=''; document.getElementById('m-party').classList.remove('hidden'); }
+function editParty(p){ document.getElementById('m-party-id').value=p.id; document.getElementById('m-party-title').textContent='Edit Party'; document.getElementById('m-party-name').value=p.party_name; document.getElementById('m-party-short').value=p.short_name; document.getElementById('m-party-color').value=p.color||'#22c55e'; document.getElementById('m-party-logo').value=p.logo||''; document.getElementById('m-party').classList.remove('hidden'); }
+async function uploadPartyLogo(){ const f=document.getElementById('m-party-logo-file').files[0]; if(!f) return; const fd=new FormData(); fd.append('file',f); const st=document.getElementById('m-party-logo-status'); st.textContent='Uploading…'; try{ const res=await fetch(API+'/admin/upload',{method:'POST',headers:{'Authorization':'Bearer '+authToken},body:fd}); const d=await res.json(); if(!res.ok) throw new Error(d.error||'fail'); document.getElementById('m-party-logo').value=d.url; st.textContent='✓ uploaded'; }catch(e){ st.textContent='upload failed'; } }
+async function saveParty(){ const id=document.getElementById('m-party-id').value; const payload={party_name:document.getElementById('m-party-name').value.trim(),short_name:document.getElementById('m-party-short').value.trim(),color:document.getElementById('m-party-color').value,logo:document.getElementById('m-party-logo').value.trim()}; if(!payload.party_name||!payload.short_name) return showToast('Name and short name required.','bg-red-600'); try{ if(id) await apiFetch('/admin/parties/'+id,{method:'PUT',body:payload}); else await apiFetch('/admin/parties',{method:'POST',body:payload}); closeModal('m-party'); loadAdminParties(); loadParties(); showToast('Saved.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+async function delParty(id){ if(!confirm('Delete this party?')) return; try{ await apiFetch('/admin/parties/'+id,{method:'DELETE'}); loadAdminParties(); loadParties(); showToast('Deleted.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+
+// ── Admin: unions ──
+async function loadAdminUnions(){ try{ const rows=await apiFetch('/admin/unions'); document.getElementById('a-union-rows').innerHTML=rows.map((u,i)=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 text-gray-500 font-bold">${i+1}</td><td class="px-4 py-3 font-semibold text-gray-800">${u.union_name}</td><td class="px-4 py-3">${u.union_code||'—'}</td><td class="px-4 py-3 text-center">${fmt(u.registered_voters)}</td><td class="px-4 py-3 text-center">${fmt(u.ps_count)}</td><td class="px-4 py-3 text-right"><button onclick='editUnion(${JSON.stringify(u)})' class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-semibold mr-1"><i class="fas fa-edit"></i></button><button onclick="delUnion(${u.id})" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-semibold"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }catch(e){ showToast(e.message,'bg-red-600'); } }
+function openUnionModal(){ document.getElementById('m-union-id').value=''; document.getElementById('m-union-title').textContent='Add Union Council'; document.getElementById('m-union-name').value=''; document.getElementById('m-union-code').value=''; document.getElementById('m-union-reg').value='0'; document.getElementById('m-union').classList.remove('hidden'); }
+function editUnion(u){ document.getElementById('m-union-id').value=u.id; document.getElementById('m-union-title').textContent='Edit Union Council'; document.getElementById('m-union-name').value=u.union_name; document.getElementById('m-union-code').value=u.union_code||''; document.getElementById('m-union-reg').value=u.registered_voters||0; document.getElementById('m-union').classList.remove('hidden'); }
+async function saveUnion(){ const id=document.getElementById('m-union-id').value; const payload={union_name:document.getElementById('m-union-name').value.trim(),union_code:document.getElementById('m-union-code').value.trim(),registered_voters:Number(document.getElementById('m-union-reg').value)||0}; if(!payload.union_name) return showToast('Name required.','bg-red-600'); try{ if(id) await apiFetch('/admin/unions/'+id,{method:'PUT',body:payload}); else await apiFetch('/admin/unions',{method:'POST',body:payload}); closeModal('m-union'); loadAdminUnions(); loadPublic(); showToast('Saved.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+async function delUnion(id){ if(!confirm('Delete this union council?')) return; try{ await apiFetch('/admin/unions/'+id,{method:'DELETE'}); loadAdminUnions(); loadPublic(); showToast('Deleted.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+
+// ── Admin: stations ──
+async function loadAdminStations(){ try{ const rows=await apiFetch('/admin/polling-stations'); document.getElementById('a-station-rows').innerHTML=rows.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold text-gray-800">${s.station_name}</td><td class="px-4 py-3">${s.station_code||'—'}</td><td class="px-4 py-3">${s.union_name||'—'}</td><td class="px-4 py-3 text-center">${fmt(s.registered_voters)}</td><td class="px-4 py-3 text-center">${fmt(s.votes_counted)}</td><td class="px-4 py-3 text-right"><button onclick='editStation(${JSON.stringify(s)})' class="text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs font-semibold mr-1"><i class="fas fa-edit"></i></button><button onclick="delStation(${s.id})" class="text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs font-semibold"><i class="fas fa-trash"></i></button></td></tr>`).join(''); }catch(e){ showToast(e.message,'bg-red-600'); } }
+function fillUnionSelect(sel,val){ sel.innerHTML='<option value="">— Select —</option>'+data.unions.map(u=>`<option value="${u.id}">${u.union_name}</option>`).join(''); if(val) sel.value=val; }
+function openStationModal(){ document.getElementById('m-station-id').value=''; document.getElementById('m-station-title').textContent='Add Polling Station'; ['m-station-name','m-station-code','m-station-loc'].forEach(i=>document.getElementById(i).value=''); document.getElementById('m-station-reg').value='0'; fillUnionSelect(document.getElementById('m-station-union')); document.getElementById('m-station').classList.remove('hidden'); }
+function editStation(s){ document.getElementById('m-station-id').value=s.id; document.getElementById('m-station-title').textContent='Edit Polling Station'; document.getElementById('m-station-name').value=s.station_name; document.getElementById('m-station-code').value=s.station_code||''; fillUnionSelect(document.getElementById('m-station-union'),s.union_id); document.getElementById('m-station-loc').value=s.location||''; document.getElementById('m-station-reg').value=s.registered_voters||0; document.getElementById('m-station').classList.remove('hidden'); }
+async function saveStation(){ const id=document.getElementById('m-station-id').value; const payload={station_name:document.getElementById('m-station-name').value.trim(),station_code:document.getElementById('m-station-code').value.trim(),union_id:Number(document.getElementById('m-station-union').value)||null,location:document.getElementById('m-station-loc').value.trim(),registered_voters:Number(document.getElementById('m-station-reg').value)||0}; if(!payload.station_name) return showToast('Station name required.','bg-red-600'); try{ if(id) await apiFetch('/admin/polling-stations/'+id,{method:'PUT',body:payload}); else await apiFetch('/admin/polling-stations',{method:'POST',body:payload}); closeModal('m-station'); loadAdminStations(); loadPublic(); showToast('Saved.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+async function delStation(id){ if(!confirm('Delete this polling station and its results?')) return; try{ await apiFetch('/admin/polling-stations/'+id,{method:'DELETE'}); loadAdminStations(); loadPublic(); showToast('Deleted.','bg-green-600'); }catch(e){ showToast(e.message,'bg-red-600'); } }
+
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+let toastTimer=null;
+function showToast(msg,bg='bg-green-600'){ const t=document.getElementById('toast'),ti=document.getElementById('toast-inner'),tm=document.getElementById('toast-msg'); if(!t) return; ti.className=`flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl text-white text-sm font-medium ${bg}`; tm.textContent=msg; t.classList.add('show'); if(toastTimer) clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),4000); }
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
