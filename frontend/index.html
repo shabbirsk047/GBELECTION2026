@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3629088780949329"
-        crossorigin="anonymous"></script>
-</head>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -439,11 +435,11 @@ function renderWinnerTop3(){
   const cands=[...data.candidates].sort((a,b)=>b.vote_count-a.vote_count);
   const total=cands.reduce((s,c)=>s+Number(c.vote_count),0);
   const win=document.getElementById('home-winner');
-  if(cands[0]){ const w=cands[0],v=Number(w.vote_count); win.innerHTML=`<div class="text-yellow-400 text-lg mb-2 font-bold">🏆 Leading Candidate</div>${photoEl(w.name,w.party_name,w.photo,'avatar-lg mx-auto mb-3')}<div class="text-xl font-black text-white">${w.name}</div><div class="text-green-200 text-sm">${w.party_name}</div><div class="mt-2 flex justify-center">${flagImg(w,'h-9 w-14')}</div><div class="mt-3 text-3xl font-black text-yellow-400">${fmt(v)} Votes</div><div class="text-green-200 text-sm">${pctOf(v,total)}% of counted votes</div>`; }
+  if(cands[0]){ const w=cands[0],v=Number(w.vote_count); win.innerHTML=`<div class="text-yellow-400 text-lg mb-2 font-bold">🏆 Leading Candidate</div><div class="text-4xl leading-none mb-1">👑</div>${photoEl(w.name,w.party_name,w.photo,'avatar-lg mx-auto mb-3')}<div class="text-xl font-black text-white">${w.name}</div><div class="text-green-200 text-sm">${w.party_name}</div><div class="mt-2 flex justify-center">${flagImg(w,'h-9 w-14')}</div><div class="mt-3 text-3xl font-black text-yellow-400">${fmt(v)} Votes</div><div class="text-green-200 text-sm">${pctOf(v,total)}% of counted votes</div>`; }
   else win.innerHTML='<div class="text-green-200">No results counted yet.</div>';
   const top=cands.slice(0,3), order=[1,0,2], heights=['190px','230px','190px'], badges=['🥈 2nd','🥇 1st','🥉 3rd'], cls=['r2','r1','r3'];
   document.getElementById('home-top3').innerHTML = order.map((ri,pi)=>{ if(!top[ri]) return ''; const c=top[ri],v=Number(c.vote_count);
-    return `<div class="text-center fadein">${photoEl(c.name,c.party_name,c.photo,'avatar-lg mx-auto mb-2 shadow-xl border-4 border-white')}<div class="font-bold text-white text-sm">${c.name}</div><div class="text-xs text-green-200">${c.party_name}</div><div class="flex justify-center mt-1">${flagImg(c,'h-6 w-9')}</div><div class="${cls[pi]} rounded-2xl px-4 mt-3 flex flex-col items-center justify-start pt-3" style="height:${heights[pi]}"><div class="text-2xl font-black text-white">${badges[pi]}</div><div class="text-white font-bold text-lg mt-1">${fmt(v)}</div><div class="text-white text-sm opacity-80">votes</div><div class="text-white font-bold text-xl mt-2">${pctOf(v,total)}%</div></div></div>`;
+    return `<div class="text-center fadein">${ri===0?'<div class="text-3xl leading-none mb-1">👑</div>':'<div class="mb-1" style="height:1.9rem"></div>'}${photoEl(c.name,c.party_name,c.photo,'avatar-lg mx-auto mb-2 shadow-xl border-4 border-white')}<div class="font-bold text-white text-sm">${c.name}</div><div class="text-xs text-green-200">${c.party_name}</div><div class="flex justify-center mt-1">${flagImg(c,'h-6 w-9')}</div><div class="${cls[pi]} rounded-2xl px-4 mt-3 flex flex-col items-center justify-start pt-3" style="height:${heights[pi]}"><div class="text-2xl font-black text-white">${badges[pi]}</div><div class="text-white font-bold text-lg mt-1">${fmt(v)}</div><div class="text-white text-sm opacity-80">votes</div><div class="text-white font-bold text-xl mt-2">${pctOf(v,total)}%</div></div></div>`;
   }).join('');
 }
 function renderRankings(){
